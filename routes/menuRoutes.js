@@ -3,10 +3,12 @@ const express = require('express');
 const router = express.Router();
 
 const MenuItem = require('../models/MenuItem');
+const { requireRole } = require('../middleware/auth');
 
 router.get('/', async (req, res) => {
     try {
-        const menuItems = await MenuItem.find();
+        const filter = req.user.role === 'admin' ? {} : { available: true };
+        const menuItems = await MenuItem.find(filter);
         res.json(menuItems);
     } catch (error) {
         res.status(500).json({ message: error.message });

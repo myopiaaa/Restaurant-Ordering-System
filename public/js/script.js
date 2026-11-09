@@ -72,6 +72,25 @@ function escapeHTML(value) {
     })[character]);
 }
 
+async function readResponse(response, fallbackMessage) {
+    const contentType = response.headers.get('content-type') || '';
+
+    if (!contentType.includes('application/json')) {
+        await response.text();
+        throw new Error(
+            `${fallbackMessage} The server returned an unexpected response (HTTP ${response.status}). Please check the API route.`
+        );
+    }
+
+    const result = await response.json();
+
+    if (!response.ok) {
+        throw new Error(result.message || fallbackMessage);
+    }
+
+    return result;
+}
+
 document.getElementById('menuForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
@@ -101,11 +120,7 @@ document.getElementById('menuForm').addEventListener('submit', async function (e
             }
         );
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Unable to save menu item.');
-        }
+        await readResponse(response, 'Unable to save menu item.');
 
         alert(id ? 'Menu item updated!' : 'Menu item added!');
 
@@ -156,11 +171,7 @@ async function deleteMenuItem(id) {
             method: 'DELETE'
         });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Unable to delete menu item.');
-        }
+        await readResponse(response, 'Unable to delete menu item.');
 
         alert('Menu item deleted!');
 
@@ -317,11 +328,7 @@ document.getElementById('placeOrderButton').addEventListener('click', async func
             body: JSON.stringify(orderData)
         });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Unable to create order.');
-        }
+        await readResponse(response, 'Unable to create order.');
 
         alert('Order placed successfully!');
 
@@ -378,7 +385,7 @@ function displayOrders() {
                 <td>${itemNames}</td>
                 <td>${formatCurrency(order.totalAmount)}</td>
                 <td>
-                    <span class="status-${order.status.toLowerCase()}">
+                    <span class="status-${escapeHTML(order.status.toLowerCase())}">
                         ${escapeHTML(order.status)}
                     </span>
                 </td>
@@ -397,16 +404,16 @@ function displayOrders() {
 }
 
 async function markAsServed(id) {
+    const confirmed = confirm('Are you sure you want to mark this order as served?');
+
+    if (!confirmed) return;
+
     try {
-        const response = await fetch(`${API_URL}/orders/${id}/serve`, {
+        const response = await fetch(`${API_URL}/orders/${id}`, {
             method: 'PUT'
         });
 
-        const result = await response.json();
-
-        if (!response.ok) {
-            throw new Error(result.message || 'Unable to update order.');
-        }
+        await readResponse(response, 'Unable to update order.');
 
         alert('Order marked as served!');
 
@@ -421,7 +428,6 @@ async function markAsServed(id) {
 async function loadDailySales() {
     const datePicker = document.getElementById('salesDatePicker');
 
-    // Set today's date as the default
     if (!datePicker.value) {
         const today = new Date();
         const localDate = new Date(
@@ -435,7 +441,7 @@ async function loadDailySales() {
 
     try {
         const response = await fetch(
-            `/api/orders/sales/daily?date=${selectedDate}`
+            `${API_URL}/orders/sales/daily?date=${encodeURIComponent(selectedDate)}`
         );
 
         if (!response.ok) {
@@ -450,7 +456,6 @@ async function loadDailySales() {
         document.getElementById('dailyOrderCount').textContent =
             `${data.orderCount} served orders`;
 
-        // Update dashboard sales if the element exists
         const dashboardSales = document.getElementById('dashboardSales');
 
         if (dashboardSales) {
@@ -506,11 +511,12 @@ window.addEventListener('scroll', updateActiveNav);
 window.addEventListener('load', updateActiveNav);
 
 function filterMenuByCategory() {
-    const selectedCategory =
-        document.getElementById('menuCategoryFilter').value;
+    const filter = document.getElementById('menuCategoryFilter');
 
-    const menuRows =
-        document.querySelectorAll('#menuTableBody tr');
+    if (!filter) return;
+
+    const selectedCategory = filter.value;
+    const menuRows = document.querySelectorAll('#menuTableBody tr');
 
     menuRows.forEach(row => {
         const categoryCell = row.cells[1];

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALO-SALO | Order</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/auth.js"></script>
+    <script>Auth.requireRole('customer');</script>
+</head>
+
+<body>
+
+    <div class="sidebar">
+        <h2>SALO-SALO</h2>
+
+        <nav>
+            <a href="#ordering" class="active">Create Order</a>
+            <a href="#" id="logoutLink">Logout</a>
+        </nav>
+    </div>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <h1>Welcome to SALO-SALO</h1>
+                <p>Choose your food and place your order</p>
+            </div>
+        </header>
+
+        <section id="ordering" class="section">
+            <h2>Create Order</h2>
+
+            <div class="form-container">
+                <h3>Select Menu Items</h3>
+
+                <div class="menu-filter">
+                    <label for="orderCategoryFilter">Filter by Category:</label>
+
+                    <select id="orderCategoryFilter">
+                        <option value="All">All Categories</option>
+                        <option value="Main Course">Main Course</option>
+                        <option value="Appetizer">Appetizer</option>
+                        <option value="Beverage">Beverage</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Side Dish">Side Dish</option>
+                    </select>
+                </div>
+
+                <div id="orderMenuList">
+                    Loading menu...
+                </div>
+            </div>
+
+            <div class="table-container">
+                <h3>Current Order</h3>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Price</th>
+                            <th>Quantity</th>
+                            <th>Subtotal</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="cartTableBody">
+                        <tr>
+                            <td colspan="5">No items added.</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3 id="orderTotal">Total: ₱0.00</h3>
+
+                <button type="button" id="placeOrderButton">
+                    Place Order
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="js/customer.js"></script>
+</body>
+
+</html>

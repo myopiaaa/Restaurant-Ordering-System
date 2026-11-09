@@ -2,11 +2,13 @@
 const express = require('express');
 const router = express.Router();
 
+const { requireRole } = require('../middleware/auth');
+
 const Order = require('../models/Order');
 const OrderItem = require('../models/OrderItem');
 const MenuItem = require('../models/MenuItem');
 
-router.get('/', async (req, res) => {
+router.get('/', requireRole('admin'), async (req, res) => {
     try {
         const orders = await Order.find().sort({ createdAt: -1 });
 
@@ -29,7 +31,7 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', requireRole('admin', 'customer'), async (req, res) => {
     try {
         const { items } = req.body;
 
@@ -101,7 +103,7 @@ router.post('/', async (req, res) => {
     }
 });
 
-router.put('/:id/serve', async (req, res) => {
+router.put('/:id', requireRole('admin'), async (req, res) => {
     try {
         const order = await Order.findByIdAndUpdate(
             req.params.id,
@@ -127,7 +129,7 @@ router.put('/:id/serve', async (req, res) => {
     }
 });
 
-router.get('/sales/daily', async (req, res) => {
+router.get('/sales/daily', requireRole('admin'), async (req, res) => {
     try {
         const date = req.query.date;
 
