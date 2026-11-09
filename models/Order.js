@@ -11,6 +11,10 @@ const orderSchema = new mongoose.Schema({
         type: String,
         enum: ['Pending', 'Served'],
         default: 'Pending'
+    },
+    servedAt: {
+        type: Date,
+        default: null
     }
 }, {
     timestamps: true

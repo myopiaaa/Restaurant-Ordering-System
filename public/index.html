@@ -1,12 +1,13 @@
-
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Restaurant Ordering System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
+
 <body>
 
     <div class="sidebar">
@@ -179,19 +180,37 @@
         <section id="sales" class="section">
             <h2>Daily Sales</h2>
 
-            <div class="card sales-card">
-                <h3>Today's Sales</h3>
-                <p id="dailySales">₱0.00</p>
-                <span id="dailyOrderCount">0 served orders</span>
-            </div>
+            <div class="table-container">
+                <h3>Sales Report</h3>
 
-            <button type="button" id="refreshSalesButton">
-                Refresh Sales
-            </button>
+                <div class="sales-filter">
+                    <div class="sales-date">
+                        <label for="salesDatePicker">Select Date</label>
+                        <input type="date" id="salesDatePicker">
+                    </div>
+
+                    <button type="button" id="refreshSalesButton">
+                        View Sales
+                    </button>
+                </div>
+
+                <div class="dashboard-cards sales-cards">
+                    <div class="card">
+                        <h3>Total Sales</h3>
+                        <p id="dailySales">₱0.00</p>
+                    </div>
+
+                    <div class="card">
+                        <h3>Served Orders</h3>
+                        <p id="dailyOrderCount">0</p>
+                    </div>
+                </div>
+            </div>
         </section>
 
     </main>
 
     <script src="js/script.js"></script>
 </body>
+
 </html>

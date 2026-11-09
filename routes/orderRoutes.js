@@ -103,45 +103,51 @@ router.post('/', async (req, res) => {
 
 router.put('/:id/serve', async (req, res) => {
     try {
-        const updatedOrder = await Order.findByIdAndUpdate(
+        const order = await Order.findByIdAndUpdate(
             req.params.id,
-            { status: 'Served' },
+            {
+                status: 'Served',
+                servedAt: new Date()
+            },
             { new: true }
         );
 
-        if (!updatedOrder) {
+        if (!order) {
             return res.status(404).json({
-                message: 'Order not found.'
+                message: 'Order not found'
             });
         }
 
-        res.json({
-            message: 'Order marked as served!',
-            order: updatedOrder
-        });
+        res.json(order);
 
     } catch (error) {
-        res.status(400).json({ message: error.message });
+        res.status(500).json({
+            message: error.message
+        });
     }
 });
 
 router.get('/sales/daily', async (req, res) => {
     try {
-        const now = new Date();
+        const date = req.query.date;
 
-        const startOfDay = new Date(now);
-        startOfDay.setHours(0, 0, 0, 0);
+        if (!date || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+            return res.status(400).json({
+                message: 'Please provide a valid date.'
+            });
+        }
 
-        const endOfDay = new Date(now);
-        endOfDay.setHours(23, 59, 59, 999);
+        const startDate = new Date(`${date}T00:00:00`);
+        const endDate = new Date(startDate);
+        endDate.setDate(endDate.getDate() + 1);
 
-        const sales = await Order.aggregate([
+        const result = await Order.aggregate([
             {
                 $match: {
                     status: 'Served',
-                    createdAt: {
-                        $gte: startOfDay,
-                        $lte: endOfDay
+                    servedAt: {
+                        $gte: startDate,
+                        $lt: endDate
                     }
                 }
             },
@@ -149,19 +155,24 @@ router.get('/sales/daily', async (req, res) => {
                 $group: {
                     _id: null,
                     totalSales: { $sum: '$totalAmount' },
-                    totalOrders: { $sum: 1 }
+                    orderCount: { $sum: 1 }
                 }
             }
         ]);
 
         res.json({
-            date: now.toLocaleDateString(),
-            totalSales: sales.length > 0 ? sales[0].totalSales : 0,
-            totalOrders: sales.length > 0 ? sales[0].totalOrders : 0
+            totalSales: result.length > 0
+                ? result[0].totalSales
+                : 0,
+            orderCount: result.length > 0
+                ? result[0].orderCount
+                : 0
         });
 
     } catch (error) {
-        res.status(500).json({ message: error.message });
+        res.status(500).json({
+            message: error.message
+        });
     }
 });
 

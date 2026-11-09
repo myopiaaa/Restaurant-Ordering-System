@@ -407,26 +407,47 @@ async function markAsServed(id) {
 }
 
 async function loadDailySales() {
+    const datePicker = document.getElementById('salesDatePicker');
+
+    // Set today's date as the default
+    if (!datePicker.value) {
+        const today = new Date();
+        const localDate = new Date(
+            today.getTime() - today.getTimezoneOffset() * 60000
+        ).toISOString().split('T')[0];
+
+        datePicker.value = localDate;
+    }
+
+    const selectedDate = datePicker.value;
+
     try {
-        const response = await fetch(`${API_URL}/orders/sales/daily`);
+        const response = await fetch(
+            `/api/orders/sales/daily?date=${selectedDate}`
+        );
 
         if (!response.ok) {
-            throw new Error('Failed to load daily sales.');
+            throw new Error('Failed to load sales data.');
         }
 
-        const sales = await response.json();
+        const data = await response.json();
 
         document.getElementById('dailySales').textContent =
-            formatCurrency(sales.totalSales);
+            `₱${Number(data.totalSales).toFixed(2)}`;
 
         document.getElementById('dailyOrderCount').textContent =
-            `${sales.totalOrders} served orders`;
+            `${data.orderCount} served orders`;
 
-        document.getElementById('dashboardSales').textContent =
-            formatCurrency(sales.totalSales);
+        // Update dashboard sales if the element exists
+        const dashboardSales = document.getElementById('dashboardSales');
+
+        if (dashboardSales) {
+            dashboardSales.textContent =
+                `₱${Number(data.totalSales).toFixed(2)}`;
+        }
 
     } catch (error) {
-        console.error(error);
+        console.error('Daily sales error:', error);
     }
 }
 
@@ -435,7 +456,8 @@ function updateDashboard() {
     document.getElementById('orderCount').textContent = orders.length;
 }
 
-document.getElementById('refreshSalesButton').addEventListener('click', loadDailySales);
+document.getElementById('refreshSalesButton')
+    .addEventListener('click', loadDailySales);
 
 async function initializeApp() {
     await loadMenu();
