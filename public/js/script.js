@@ -58,6 +58,8 @@ function displayMenu() {
             </td>
         </tr>
     `).join('');
+
+    filterMenuByCategory();
 }
 
 function escapeHTML(value) {
@@ -70,7 +72,7 @@ function escapeHTML(value) {
     })[character]);
 }
 
-document.getElementById('menuForm').addEventListener('submit', async function(event) {
+document.getElementById('menuForm').addEventListener('submit', async function (event) {
     event.preventDefault();
 
     const id = document.getElementById('menuItemId').value;
@@ -171,11 +173,20 @@ async function deleteMenuItem(id) {
 
 function displayOrderMenu() {
     const container = document.getElementById('orderMenuList');
+    const categoryFilter = document.getElementById('orderCategoryFilter');
 
-    const availableItems = menuItems.filter(item => item.available);
+    const selectedCategory = categoryFilter
+        ? categoryFilter.value
+        : 'All';
+
+    const availableItems = menuItems.filter(item => {
+        return item.available &&
+            (selectedCategory === 'All' ||
+                item.category === selectedCategory);
+    });
 
     if (availableItems.length === 0) {
-        container.innerHTML = '<p>No available menu items.</p>';
+        container.innerHTML = '<p>No available menu items in this category.</p>';
         return;
     }
 
@@ -183,6 +194,7 @@ function displayOrderMenu() {
         <div class="menu-option">
             <div>
                 <strong>${escapeHTML(item.name)}</strong>
+                <p>${escapeHTML(item.category)}</p>
                 <p>${formatCurrency(item.price)}</p>
             </div>
 
@@ -283,7 +295,7 @@ function removeFromCart(index) {
     displayCart();
 }
 
-document.getElementById('placeOrderButton').addEventListener('click', async function() {
+document.getElementById('placeOrderButton').addEventListener('click', async function () {
     if (cart.length === 0) {
         alert('Please add items to the order first.');
         return;
@@ -373,11 +385,11 @@ function displayOrders() {
                 <td>${date}</td>
                 <td>
                     ${order.status === 'Pending'
-                        ? `<button onclick="markAsServed('${order._id}')">
+                ? `<button onclick="markAsServed('${order._id}')">
                             Mark Served
                            </button>`
-                        : 'Completed'
-                    }
+                : 'Completed'
+            }
                 </td>
             </tr>
         `;
@@ -475,7 +487,7 @@ function updateActiveNav() {
 
     sections.forEach(section => {
         const sectionTop = section.offsetTop;
-        
+
         if (window.scrollY >= sectionTop - 150) {
             currentSection = section.getAttribute('id');
         }
@@ -492,3 +504,34 @@ function updateActiveNav() {
 
 window.addEventListener('scroll', updateActiveNav);
 window.addEventListener('load', updateActiveNav);
+
+function filterMenuByCategory() {
+    const selectedCategory =
+        document.getElementById('menuCategoryFilter').value;
+
+    const menuRows =
+        document.querySelectorAll('#menuTableBody tr');
+
+    menuRows.forEach(row => {
+        const categoryCell = row.cells[1];
+
+        if (!categoryCell) return;
+
+        const category = categoryCell.textContent.trim();
+
+        if (
+            selectedCategory === 'All' ||
+            category === selectedCategory
+        ) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+document.getElementById('menuCategoryFilter')
+    .addEventListener('change', filterMenuByCategory);
+
+document.getElementById('orderCategoryFilter')
+    .addEventListener('change', displayOrderMenu);

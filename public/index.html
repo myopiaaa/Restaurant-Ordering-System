@@ -1,17 +1,18 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant Ordering System</title>
+    <title>SALO-SALO | Restaurant Ordering System</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
     <div class="sidebar">
-        <h2>Restaurant</h2>
+        <h2>SALO-SALO</h2>
 
         <nav>
             <a href="#dashboard">Dashboard</a>
@@ -26,7 +27,7 @@
 
         <header class="topbar">
             <div>
-                <h1>Restaurant Ordering System</h1>
+                <h1>Welcome to SALO-SALO</h1>
                 <p>Manage your restaurant operations</p>
             </div>
         </header>
@@ -92,6 +93,19 @@
             <div class="table-container">
                 <h3>Restaurant Menu</h3>
 
+                <div class="menu-filter">
+                    <label for="menuCategoryFilter">Filter by Category:</label>
+
+                    <select id="menuCategoryFilter">
+                        <option value="All">All Categories</option>
+                        <option value="Main Course">Main Course</option>
+                        <option value="Appetizer">Appetizer</option>
+                        <option value="Beverage">Beverage</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Side Dish">Side Dish</option>
+                    </select>
+                </div>
+
                 <table>
                     <thead>
                         <tr>
@@ -117,6 +131,19 @@
 
             <div class="form-container">
                 <h3>Select Menu Items</h3>
+
+                <div class="menu-filter">
+                    <label for="orderCategoryFilter">Filter by Category:</label>
+
+                    <select id="orderCategoryFilter">
+                        <option value="All">All Categories</option>
+                        <option value="Main Course">Main Course</option>
+                        <option value="Appetizer">Appetizer</option>
+                        <option value="Beverage">Beverage</option>
+                        <option value="Dessert">Dessert</option>
+                        <option value="Side Dish">Side Dish</option>
+                    </select>
+                </div>
 
                 <div id="orderMenuList">
                     Loading menu...
@@ -181,7 +208,6 @@
             <h2>Daily Sales</h2>
 
             <div class="table-container">
-                <h3>Sales Report</h3>
 
                 <div class="sales-filter">
                     <div class="sales-date">
