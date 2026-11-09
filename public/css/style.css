@@ -5,6 +5,10 @@
     box-sizing: border-box;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f5f7;
@@ -264,6 +268,12 @@ th {
 
 .sales-cards .card p {
     color: #a34d32;
+}
+
+.sidebar nav a.active {
+    background-color: #a34d32;
+    color: white;
+    font-weight: bold;
 }
 
 @media (max-width: 600px) {
